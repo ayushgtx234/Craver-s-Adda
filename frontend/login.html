@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craver's Adda - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-side-image" style="background-image: url('images/auth_bg.png')">
+            <div style="z-index: 10; text-align: left; padding: 0 15%; color: white;">
+                <h1 class="serif" style="font-size: 3.5rem; margin-bottom: 20px;">Taste the <br>Extraordinary</h1>
+                <p style="font-size: 1.1rem; opacity: 0.9; max-width: 400px;">Experience premium dining from the comfort of your home. Freshly prepared, delivered with love.</p>
+            </div>
+        </div>
+        
+        <div class="auth-form-container">
+            <div class="auth-card" id="login-form">
+                <div class="auth-header">
+                    <img src="images/burger_header.png" alt="Burger" style="width: 150px; height: 150px; object-fit: contain; margin-bottom: 20px;">
+                    <div class="logo serif">Craver's <span>Adda</span></div>
+                    
+                    <div class="auth-form-content">
+                        <h2>Welcome Back</h2>
+                        <p>Login to your premium account</p>
+                        
+                        <div class="form-group" style="margin-top: 40px;">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" id="phone-number" class="form-input" placeholder="+91 00000 00000">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Enter OTP</label>
+                            <div class="otp-container">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                            </div>
+                        </div>
+
+                        <div style="text-align: right; margin-bottom: 20px;">
+                            <a href="#" id="use-demo-creds" style="color: var(--primary-color, #ff4757); font-size: 0.9rem; text-decoration: none;">Use Demo Credentials</a>
+                        </div>
+                        
+                        <button class="btn-primary" id="login-btn" style="width: 100%; padding: 20px; margin-bottom: 15px;">Login</button>
+                    </div>
+                </div>
+                
+                <div class="auth-footer">
+                    Don't have an account? <a href="signup.html">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

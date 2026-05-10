@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craver's Adda - Surprise Result</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="top-header">
+        <div class="logo serif">Craver's <span>Adda</span></div>
+        <nav class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="orders.html">Menu</a>
+            <a href="#">About Us</a>
+            <a href="#">Contact</a>
+        </nav>
+        <div class="nav-actions">
+            <a href="login.html" class="signup-pill">Sign up</a>
+        </div>
+    </header>
+
+    <main style="padding: 150px 8%;">
+        <div class="section-title">
+            <h1 id="surprise-title" class="serif" style="font-size: 3rem;">Finding Magic...</h1>
+        </div>
+        
+        <div id="rec-container" class="product-grid" style="display: none; justify-content: center; margin-top: 50px;">
+            <div class="product-card" style="width: 350px; padding: 40px;">
+                <div class="product-img-wrapper" style="width: 250px; height: 250px; top: -120px;">
+                    <img id="dish-image" src="" class="product-img">
+                </div>
+                <div class="product-content" style="margin-top: 150px;">
+                    <div id="dish-name" class="product-title serif" style="font-size: 2rem;"></div>
+                    <div id="res-name" class="product-sub" style="font-size: 1.1rem; margin-bottom: 10px;"></div>
+                    <div id="dish-tags" style="margin-bottom: 20px;"></div>
+                    
+                    <div class="product-footer">
+                        <span id="dish-price" class="product-price" style="font-size: 1.8rem;"></span>
+                        <div class="add-cart" style="width: 50px; height: 50px; font-size: 1.2rem;" onclick="alert('Added to cart!')">
+                            <i class="fa-solid fa-cart-shopping"></i>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-secondary" style="width: 100%; margin-top: 30px;" onclick="triggerSurprise()">Try Another Experience</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="loading-state" style="text-align: center; margin-top: 100px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 4rem; color: var(--primary-red);"></i>
+            <p style="margin-top: 30px; color: var(--text-gray); font-size: 1.2rem;">Crafting your unique culinary experience...</p>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api/v1';
+        const SESSION_ID = crypto.randomUUID();
+
+        async function triggerSurprise() {
+            const container = document.getElementById('rec-container');
+            const loader = document.getElementById('loading-state');
+            const title = document.getElementById('surprise-title');
+
+            container.style.display = 'none';
+            loader.style.display = 'block';
+            title.textContent = "Finding Magic...";
+
+            try {
+                const response = await fetch(`${API_BASE}/surprise?session_id=${SESSION_ID}&user_id=default-user`);
+                if (!response.ok) throw new Error('No results');
+                
+                const dish = await response.json();
+                
+                document.getElementById('dish-image').src = dish.image_url;
+                document.getElementById('dish-name').textContent = dish.dish_name;
+                document.getElementById('dish-price').textContent = `₹${dish.price}`;
+                document.getElementById('res-name').textContent = dish.restaurant.name;
+                
+                const tagsContainer = document.getElementById('dish-tags');
+                tagsContainer.innerHTML = '';
+                if (dish.dietary_tags && dish.dietary_tags.length > 0) {
+                    const tag = document.createElement('span');
+                    tag.style.background = 'rgba(229, 45, 39, 0.1)';
+                    tag.style.color = 'var(--primary-red)';
+                    tag.style.padding = '5px 15px';
+                    tag.style.borderRadius = '20px';
+                    tag.style.fontSize = '0.8rem';
+                    tag.style.fontWeight = '700';
+                    tag.textContent = dish.dietary_tags[0].toUpperCase();
+                    tagsContainer.appendChild(tag);
+                }
+
+                loader.style.display = 'none';
+                container.style.display = 'flex';
+                title.textContent = "Your Experience is Ready";
+            } catch (error) {
+                alert("The chef is busy. Please try again.");
+                window.location.href = 'index.html';
+            }
+        }
+
+        window.onload = triggerSurprise;
+    </script>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand footer-col">
+                <div class="logo serif">Craver's <span>Adda</span></div>
+                <p class="footer-tagline">Premium food experiences delivered to your door. Crafted with passion, served with love.</p>
+                <div class="footer-socials">
+                    <a href="#" class="social-btn"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="orders.html">Menu</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="orders.html">🥟 Momos</a></li>
+                    <li><a href="orders.html">🍔 Burgers</a></li>
+                    <li><a href="orders.html">🍕 Pizza</a></li>
+                    <li><a href="surprise.html">🎲 Surprise Me</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <div class="footer-contact-item"><i class="fa-solid fa-location-dot"></i><span>123 Food Street, Sector 18,<br>Noida, UP – 201301</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span>+91 98765 43210</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span>hello@craversadda.in</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-clock"></i><span>Mon – Sun: 10:00 AM – 11:00 PM</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 <span>Craver's Adda</span>. All rights reserved. Made with ❤️ in India.</p>
+            <div class="footer-badges">
+                <span class="footer-badge"><i class="fa-solid fa-shield-halved"></i> Secure Payments</span>
+                <span class="footer-badge"><i class="fa-solid fa-bolt"></i> Fast Delivery</span>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

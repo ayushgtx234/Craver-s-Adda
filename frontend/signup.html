@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craver's Adda - Sign Up</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-wrapper">
+        <div class="auth-side-image" style="background-image: url('images/auth_bg.png')">
+            <div style="z-index: 10; text-align: left; padding: 0 15%; color: white;">
+                <h1 class="serif" style="font-size: 3.5rem; margin-bottom: 20px;">Join the <br>Community</h1>
+                <p style="font-size: 1.1rem; opacity: 0.9; max-width: 400px;">Unlock exclusive offers, personalized recommendations, and faster checkout by creating an account today.</p>
+            </div>
+        </div>
+        
+        <div class="auth-form-container">
+            <div class="auth-card" id="signup-form">
+                <div class="auth-header">
+                    <img src="images/burger_header.png" alt="Burger" style="width: 150px; height: 150px; object-fit: contain; margin-bottom: 20px;">
+                    <div class="logo serif">Craver's <span>Adda</span></div>
+                    
+                    <div class="auth-form-content">
+                        <h2>Create Account</h2>
+                        <p>Start your premium culinary journey</p>
+                        
+                        <div class="form-group" style="margin-top: 30px;">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" id="full-name" class="form-input" placeholder="John Doe">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" id="phone-number" class="form-input" placeholder="+91 00000 00000">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Enter OTP</label>
+                            <div class="otp-container">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                                <input type="text" maxlength="1" class="otp-input">
+                            </div>
+                        </div>
+                        
+                        <button class="btn-primary" id="signup-submit-btn" style="width: 100%; padding: 20px; margin-bottom: 15px;">Create Account</button>
+                    </div>
+                </div>
+                
+                <div class="auth-footer">
+                    Already have an account? <a href="login.html">Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="auth.js"></script>
+</body>
+</html>

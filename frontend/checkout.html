@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Craver's Adda - Payment</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .checkout-page { min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:100px 20px 60px;gap:30px; }
+        .checkout-layout { display:grid;grid-template-columns:1.2fr 1fr;gap:30px;width:100%;max-width:1050px; }
+        .glass-card { background:var(--card-dark);border-radius:30px;padding:35px;border:1px solid var(--glass-border);box-shadow:0 20px 60px rgba(0,0,0,0.5); }
+        .section-title { font-size:1.2rem;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px; }
+        .section-title i { color:var(--primary-red); }
+        .cart-row { display:flex;align-items:center;gap:15px;padding:12px 0;border-bottom:1px solid var(--glass-border); }
+        .cart-row:last-of-type { border-bottom:none; }
+        .cart-row img { width:55px;height:55px;border-radius:12px;object-fit:cover; }
+        .cart-row-name { font-weight:600;font-size:0.9rem; }
+        .cart-row-price { color:var(--primary-red);font-weight:700;font-size:0.85rem; }
+        .qty-ctrl { display:flex;align-items:center;gap:8px; }
+        .qty-btn { background:rgba(255,255,255,0.08);border:1px solid var(--glass-border);color:white;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:var(--transition); }
+        .qty-btn:hover { background:rgba(229,45,39,0.2);border-color:var(--primary-red); }
+        .qty-num { font-weight:700;min-width:20px;text-align:center; }
+        .addr-box { background:rgba(255,255,255,0.04);border-radius:15px;padding:15px;border:1px solid var(--glass-border);font-size:0.9rem;color:var(--text-gray);line-height:1.7; }
+        .payment-opt { display:flex;align-items:center;gap:15px;padding:15px 20px;border:2px solid var(--glass-border);border-radius:15px;margin-bottom:12px;cursor:pointer;transition:var(--transition); }
+        .payment-opt:hover, .payment-opt.selected { border-color:var(--primary-red);background:rgba(229,45,39,0.08); }
+        .payment-opt i { font-size:1.4rem;color:var(--primary-red); }
+        .payment-opt-info { flex:1; }
+        .payment-opt-name { font-weight:600; }
+        .payment-opt-desc { font-size:0.8rem;color:var(--text-gray); }
+        .radio-dot { width:18px;height:18px;border-radius:50%;border:2px solid var(--glass-border);display:flex;align-items:center;justify-content:center;transition:var(--transition); }
+        .payment-opt.selected .radio-dot { border-color:var(--primary-red); }
+        .radio-dot::after { content:'';width:8px;height:8px;border-radius:50%;background:var(--primary-red);display:none; }
+        .payment-opt.selected .radio-dot::after { display:block; }
+        .summary-row { display:flex;justify-content:space-between;padding:8px 0;font-size:0.95rem;color:var(--text-gray); }
+        .summary-row.total { border-top:1px solid var(--glass-border);margin-top:10px;padding-top:15px;font-size:1.3rem;font-weight:800;color:white; }
+        .pay-btn { width:100%;background:var(--primary-gradient);color:white;border:none;padding:20px;border-radius:18px;font-size:1.05rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:var(--transition);margin-top:20px; }
+        .pay-btn:hover { transform:translateY(-2px);box-shadow:0 12px 35px rgba(229,45,39,0.45); }
+        .pay-btn:disabled { opacity:0.6;cursor:not-allowed; }
+        .success-overlay { position:fixed;inset:0;background:rgba(10,10,10,0.97);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2000;opacity:0;pointer-events:none;transition:opacity 0.5s; }
+        .success-overlay.active { opacity:1;pointer-events:auto; }
+        .success-icon { font-size:5rem;color:#22c55e;margin-bottom:20px;transform:scale(0);transition:transform 0.5s cubic-bezier(0.175,0.885,0.32,1.275); }
+        .success-overlay.active .success-icon { transform:scale(1); }
+        @media (max-width:800px) { .checkout-layout { grid-template-columns:1fr; } }
+    </style>
+</head>
+<body>
+    <header class="top-header">
+        <a href="index.html" class="logo serif" style="text-decoration:none;">Craver's <span>Adda</span></a>
+        <nav class="nav-links"><a href="index.html">Home</a><a href="orders.html">Menu</a></nav>
+        <div class="nav-actions"><div id="auth-nav"><a href="login.html" class="signup-pill">Sign up</a></div></div>
+    </header>
+
+    <div class="checkout-page">
+        <div class="checkout-layout">
+            <!-- Left: Cart + Address -->
+            <div>
+                <div class="glass-card" style="margin-bottom:25px;">
+                    <div class="section-title"><i class="fa-solid fa-basket-shopping"></i> Order Summary</div>
+                    <div id="cart-rows"></div>
+                    <div class="summary-row" style="margin-top:15px;"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+                    <div class="summary-row"><span>Delivery Fee</span><span style="color:#22c55e;">FREE</span></div>
+                    <div class="summary-row total"><span>Total</span><span id="grand-total">₹0</span></div>
+                </div>
+                <div class="glass-card">
+                    <div class="section-title"><i class="fa-solid fa-location-dot"></i> Delivering To</div>
+                    <div class="addr-box" id="addr-display">Loading address...</div>
+                    <a href="address.html" style="display:inline-block;margin-top:12px;font-size:0.85rem;color:var(--primary-red);text-decoration:none;font-weight:600;"><i class="fa-solid fa-pencil"></i> Change Address</a>
+                </div>
+            </div>
+
+            <!-- Right: Payment -->
+            <div class="glass-card">
+                <div class="section-title"><i class="fa-solid fa-credit-card"></i> Payment Method</div>
+                <div class="payment-opt selected" data-method="card" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <div class="payment-opt-info"><div class="payment-opt-name">Credit / Debit Card</div><div class="payment-opt-desc">Visa, Mastercard, RuPay</div></div>
+                    <div class="radio-dot"></div>
+                </div>
+                <div class="payment-opt" data-method="upi" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                    <div class="payment-opt-info"><div class="payment-opt-name">UPI / Wallet</div><div class="payment-opt-desc">Google Pay, PhonePe, Paytm</div></div>
+                    <div class="radio-dot"></div>
+                </div>
+                <div class="payment-opt" data-method="cod" onclick="selectPayment(this)">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <div class="payment-opt-info"><div class="payment-opt-name">Cash on Delivery</div><div class="payment-opt-desc">Pay when your food arrives</div></div>
+                    <div class="radio-dot"></div>
+                </div>
+                <button class="pay-btn" id="pay-btn" onclick="processPayment()">
+                    <i class="fa-solid fa-lock"></i>
+                    <span id="pay-text">Place Order</span>
+                </button>
+                <p style="text-align:center;margin-top:15px;font-size:0.8rem;color:var(--text-gray);">
+                    <i class="fa-solid fa-shield-halved"></i> 100% Secure & Encrypted
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="success-overlay">
+        <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h2 class="serif" style="font-size:2.5rem;margin-bottom:10px;">Order Placed!</h2>
+        <p style="color:var(--text-gray);margin-bottom:30px;">Your food is being prepared with love 🍔</p>
+        <button class="btn-primary" onclick="window.location.href='profile.html'">View My Orders</button>
+        <button class="btn-secondary" style="margin-top:15px;" onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="cart.js"></script>
+    <script>
+        let selectedMethod = 'card';
+        let currentSession = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) { window.location.href = 'signup.html'; return; }
+            currentSession = session;
+            if (Cart.count() === 0) { window.location.href = 'index.html'; return; }
+
+            // Nav
+            const authNav = document.getElementById('auth-nav');
+            if (authNav) authNav.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">
+                <a href="profile.html" class="signup-pill" style="background:rgba(255,255,255,0.1);border:1px solid var(--glass-border);"><i class="fa-solid fa-user"></i> Account</a>
+                <button onclick="supabaseClient.auth.signOut().then(()=>window.location.href='index.html')" style="background:none;border:none;color:var(--primary-red);cursor:pointer;font-size:0.8rem;font-weight:600;">Logout</button>
+            </div>`;
+
+            renderCartRows();
+            renderAddress();
+        });
+
+        function renderCartRows() {
+            const items = Cart.get();
+            const total = Cart.total();
+            document.getElementById('cart-rows').innerHTML = items.map(item => `
+                <div class="cart-row">
+                    <img src="${item.img}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=100'">
+                    <div style="flex:1;"><div class="cart-row-name">${item.name}</div><div class="cart-row-price">₹${(parseFloat(item.price)*item.qty).toFixed(2)}</div></div>
+                    <div class="qty-ctrl">
+                        <button class="qty-btn" onclick="changeQty('${item.id}', -1)">-</button>
+                        <span class="qty-num">${item.qty}</span>
+                        <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+                    </div>
+                </div>`).join('');
+            document.getElementById('subtotal').textContent = `₹${total.toFixed(2)}`;
+            document.getElementById('grand-total').textContent = `₹${total.toFixed(2)}`;
+        }
+
+        function changeQty(id, delta) {
+            if (delta > 0) {
+                const item = Cart.get().find(i => i.id === id);
+                if (item) Cart.add(item);
+            } else {
+                Cart.remove(id);
+            }
+            if (Cart.count() === 0) { window.location.href = 'index.html'; return; }
+            renderCartRows();
+        }
+
+        function renderAddress() {
+            const addr = JSON.parse(localStorage.getItem('delivery_address') || 'null');
+            const el = document.getElementById('addr-display');
+            if (!addr) {
+                el.innerHTML = `<span style="color:var(--primary-red);">No address saved. <a href="address.html" style="color:var(--primary-red);font-weight:700;">Add one</a></span>`;
+            } else {
+                el.innerHTML = `<strong>${addr.name}</strong><br>${addr.street}, ${addr.city} - ${addr.pin}${addr.landmark ? '<br>' + addr.landmark : ''}<br><span style="font-size:0.8rem;opacity:0.7;">${addr.type}</span>`;
+            }
+        }
+
+        function selectPayment(el) {
+            document.querySelectorAll('.payment-opt').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedMethod = el.dataset.method;
+        }
+
+        async function processPayment() {
+            const addr = JSON.parse(localStorage.getItem('delivery_address') || 'null');
+            if (!addr) { alert('Please add a delivery address first.'); window.location.href = 'address.html'; return; }
+
+            const btn = document.getElementById('pay-btn');
+            btn.disabled = true;
+            document.getElementById('pay-text').textContent = 'Processing...';
+
+            try {
+                const { error } = await supabaseClient.from('orders').insert({
+                    user_id: currentSession.user.id,
+                    items: Cart.get(),
+                    address: addr,
+                    total: Cart.total(),
+                    payment_method: selectedMethod,
+                    status: 'placed'
+                });
+                if (error) throw error;
+
+                Cart.clear();
+                localStorage.removeItem('delivery_address');
+                document.getElementById('success-overlay').classList.add('active');
+            } catch(e) {
+                alert('Order failed: ' + e.message);
+                btn.disabled = false;
+                document.getElementById('pay-text').textContent = 'Place Order';
+            }
+        }
+    </script>
+
+    <footer class="site-footer">
+        <div class="footer-grid">
+            <div class="footer-brand footer-col">
+                <div class="logo serif">Craver's <span>Adda</span></div>
+                <p class="footer-tagline">Premium food experiences delivered to your door. Crafted with passion, served with love.</p>
+                <div class="footer-socials">
+                    <a href="#" class="social-btn"><i class="fa-brands fa-instagram"></i></a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="orders.html">Menu</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="profile.html">My Account</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Categories</h4>
+                <ul>
+                    <li><a href="orders.html">🥟 Momos</a></li>
+                    <li><a href="orders.html">🍔 Burgers</a></li>
+                    <li><a href="orders.html">🍕 Pizza</a></li>
+                    <li><a href="surprise.html">🎲 Surprise Me</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <div class="footer-contact-item"><i class="fa-solid fa-location-dot"></i><span>123 Food Street, Sector 18,<br>Noida, UP – 201301</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-phone"></i><span>+91 98765 43210</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-envelope"></i><span>hello@craversadda.in</span></div>
+                <div class="footer-contact-item"><i class="fa-solid fa-clock"></i><span>Mon – Sun: 10:00 AM – 11:00 PM</span></div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 <span>Craver's Adda</span>. All rights reserved. Made with ❤️ in India.</p>
+            <div class="footer-badges">
+                <span class="footer-badge"><i class="fa-solid fa-shield-halved"></i> Secure Payments</span>
+                <span class="footer-badge"><i class="fa-solid fa-bolt"></i> Fast Delivery</span>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
