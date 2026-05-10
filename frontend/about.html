@@ -93,7 +93,7 @@
         </nav>
         <div class="nav-actions">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <a href="login.html" class="signup-pill">Sign up</a>
+            <div id="auth-nav"><a href="login.html" class="signup-pill">Sign up</a></div>
         </div>
     </header>
 
@@ -197,5 +197,20 @@
             </div>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const authNav = document.getElementById('auth-nav');
+            if (session && authNav) {
+                authNav.innerHTML = `<div style="display:flex;align-items:center;gap:10px;">
+                    <a href="profile.html" class="signup-pill" style="background:rgba(255,255,255,0.1);border:1px solid var(--glass-border);"><i class="fa-solid fa-user"></i> Account</a>
+                    <button onclick="supabaseClient.auth.signOut().then(()=>{window.location.reload()})" style="background:none;border:none;color:var(--primary-red);cursor:pointer;font-size:0.8rem;font-weight:600;">Logout</button>
+                </div>`;
+            }
+        });
+    </script>
 </body>
 </html>
